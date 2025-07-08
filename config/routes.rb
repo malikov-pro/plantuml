@@ -1,1 +1,1 @@
-get 'plantuml/:content_type/:filename', to: 'plantuml#convert'
+get 'plantuml/health_check', to: 'plantuml#health_check'

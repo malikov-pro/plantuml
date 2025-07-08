@@ -6,7 +6,8 @@ class PlantumlMacroTest < ActionController::TestCase
   include ERB::Util
 
   def setup
-    Setting.plugin_plantuml['plantuml_binary_default'] = '/usr/bin/plantuml'
+    Setting.plugin_plantuml['plantuml_server_url'] = 'http://localhost:8005'
+    Setting.plugin_plantuml['allow_includes'] = false
   end
 
   def test_plantuml_macro_with_png
@@ -15,7 +16,9 @@ class PlantumlMacroTest < ActionController::TestCase
 Bob -> Alice : hello
 }}
 RAW
-    assert_include '/plantuml/png/plantuml_88358e9331985a8ad4ec566b38dfd68a2875ead47b187542e2bea02c670d50ff.png', textilizable(text)
+    result = textilizable(text)
+    assert_include 'http://localhost:8005/png/', result
+    assert_include '<img', result
   end
 
   def test_plantuml_macro_with_svg
@@ -24,7 +27,25 @@ RAW
 Bob -> Alice : hello
 }}
 RAW
-    assert_include '/plantuml/svg/plantuml_88358e9331985a8ad4ec566b38dfd68a2875ead47b187542e2bea02c670d50ff.svg', textilizable(text)
+    result = textilizable(text)
+    assert_include 'http://localhost:8005/svg/', result
+    assert_include '<img', result
+  end
+
+  def test_plantuml_helper_url_generation
+    url = PlantumlHelper.generate_plantuml_url('A -> B', 'png')
+    assert_equal 'http://localhost:8005/png/SoWkIImgAStDuN9KqBLJSE9oICrB0N81', url
+  end
+
+  def test_plantuml_helper_sanitization
+    Setting.plugin_plantuml['allow_includes'] = false
+    sanitized = PlantumlHelper.sanitize_plantuml("A -> B\n!include something")
+    assert_equal "A -> B\n", sanitized
+  end
+
+  def test_plantuml_helper_encoding
+    encoded = PlantumlHelper.encode_plantuml("@startuml\nA -> B\n@enduml")
+    assert_equal 'SoWkIImgAStDuN9KqBLJSE9oICrB0N81', encoded
   end
 
 end

@@ -1,15 +1,23 @@
 <fieldset>
   <legend><%= l(:plugin_settings) %></legend>
   <p>
-    <label><%= l(:allow_includes) %></label>
-    <%= check_box_tag 'settings[allow_includes]', 1, @settings['allow_includes'] %>
-  </p> <p>
-    <label><%= l(:cache_expiration) %></label>
-    <%= text_field_tag 'settings[cache_seconds]', @settings['cache_seconds'], size: 10, disabled: true %> seconds
+    <label>PlantUML Server URL</label>
+    <%= text_field_tag 'settings[plantuml_server_url]', @settings['plantuml_server_url'], 
+                       size: 60, placeholder: 'http://localhost:8005' %>
+    <br><small>URL of the PlantUML server for rendering diagrams</small>
   </p>
   <p>
-    <label><%= l(:plantuml_binary) %></label>
-    <%= text_field_tag 'settings[plantuml_binary_default]', @settings['plantuml_binary_default'], size: 60 %>
+    <label><%= l(:allow_includes) %></label>
+    <%= check_box_tag 'settings[allow_includes]', 1, @settings['allow_includes'] %>
+    <br><small>Allow !include directives in PlantUML diagrams (security risk)</small>
+  </p>
+  <p>
+    <label>Encoding</label>
+    <%= select_tag 'settings[encoding]', 
+                   options_for_select([['Deflate (recommended)', 'deflate'], ['Base64', 'base64']], 
+                                      @settings['encoding']), 
+                   { class: 'small' } %>
+    <br><small>PlantUML diagram encoding method</small>
   </p>
 
 </fieldset>
